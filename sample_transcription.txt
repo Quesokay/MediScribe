@@ -1,0 +1,9 @@
+Patient Sarah Johnson, 32 year old female, presents with severe headache and nausea for the past 2 days. Blood pressure is 125/80, heart rate 78 bpm, temperature 98.6 Fahrenheit. Patient reports sensitivity to light and occasional vomiting. Patient is allergic to penicillin.
+
+Diagnosis: Migraine headache.
+
+Prescribed Sumatriptan 50mg as needed for migraine attacks, maximum 2 doses per day. Also recommended rest in a dark, quiet room.
+
+Treatment plan: Avoid known migraine triggers, maintain regular sleep schedule, stay hydrated. Keep a headache diary to identify patterns.
+
+Follow up in 2 weeks to assess medication effectiveness. Return immediately if symptoms include vision changes, confusion, or severe neck stiffness.
