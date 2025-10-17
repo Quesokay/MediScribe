@@ -1,0 +1,14 @@
+{
+  "watch_directory": "C:\\Users\\YourUsername\\Documents\\Vibe Transcripts",
+  "file_extensions": [
+    ".txt",
+    ".srt",
+    ".vtt",
+    ".json"
+  ],
+  "auto_process": true,
+  "process_on_modify": false,
+  "save_extracted_json": true,
+  "notification_sound": true,
+  "database_path": "medical_records.json"
+}

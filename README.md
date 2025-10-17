@@ -10,6 +10,16 @@ Transform audio transcriptions into structured medical records automatically.
 
 MediScribe extracts structured medical information from audio transcriptions (via Vibe or other tools), organizing patient data, symptoms, diagnoses, medications, and treatment plans into a searchable database.
 
+### 🎙️ **NEW: Seamless Vibe Integration!**
+
+MediScribe now integrates directly with [Vibe](https://github.com/thewh1teagle/vibe) for automatic background processing:
+
+1. **Transcribe** in Vibe (review & verify the transcript)
+2. **Save** the transcript (Vibe saves to your configured folder)
+3. **Done!** MediScribe automatically extracts and saves patient data
+
+👉 **[START HERE](START_HERE.md)** | **[5-Min Setup](VIBE_QUICK_SETUP.md)** | **[Complete Guide](VIBE_INTEGRATION.md)**
+
 ## Features
 
 ✓ **Fast Processing** - Extract data in 1-2 seconds  
@@ -24,12 +34,24 @@ MediScribe extracts structured medical information from audio transcriptions (vi
 ### Installation
 
 ```bash
-pip install spacy python-dotenv
+pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 ```
 
 ### Basic Usage
 
+**Option 1: Automatic Integration with Vibe**
+```bash
+# Start the integration service (runs in background)
+python vibe_watcher.py
+
+# Or use the Windows batch file
+start_vibe_integration.bat
+
+# Then use Vibe normally - MediScribe processes automatically!
+```
+
+**Option 2: Manual Processing**
 ```bash
 # Process a single transcription
 python batch_process.py doctor_notes.txt
@@ -54,6 +76,7 @@ python medical_extractor_simple.py
 
 ## Workflow
 
+### Manual Mode
 ```
 Doctor speaks → Vibe transcribes → Export as .txt
                                         ↓
@@ -62,6 +85,17 @@ Doctor speaks → Vibe transcribes → Export as .txt
                     Save to searchable database
                                         ↓
                     Query/export records anytime
+```
+
+### Automatic Mode (Vibe Integration)
+```
+Doctor speaks → Vibe transcribes → Review in Vibe → Save transcript
+                                                            ↓
+                                    MediScribe auto-detects & processes
+                                                            ↓
+                                    Saves to database (background)
+                                                            ↓
+                                    Ready to query instantly
 ```
 
 ## Example
@@ -94,12 +128,15 @@ Prescribed Amoxicillin 500mg three times daily.
 - `batch_process.py` - Process single or multiple files
 - `view_database.py` - View and search records
 - `database_saver.py` - Database management
+- `vibe_watcher.py` - **NEW!** Automatic Vibe integration service
+- `vibe_config.json` - Configuration for Vibe integration
 
 ## Documentation
 
 - **QUICK_START.md** - Get started guide
 - **README_SIMPLE.md** - Detailed documentation
 - **SUCCESS.md** - Complete feature overview
+- **VIBE_INTEGRATION.md** - **NEW!** Complete Vibe integration guide
 
 ## Performance
 
@@ -125,6 +162,7 @@ Easily customize for your needs:
 
 ## Roadmap
 
+- [x] **Vibe integration** - Automatic background processing
 - [ ] Web interface for doctors
 - [ ] Real-time transcription integration
 - [ ] Advanced analytics dashboard
