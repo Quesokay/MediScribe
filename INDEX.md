@@ -9,11 +9,22 @@ Complete guide to all documentation files in the MediScribe-Vibe integration.
 ### [START_HERE.md](START_HERE.md) ⭐⭐⭐
 **Your first stop!**
 - Welcome message
-- Choose your setup path
+- Choose your setup path (including multilingual!)
 - Quick overview
 - Next steps
 
 **Read this first if:** You're new to the integration
+
+---
+
+### [MULTILINGUAL_QUICK_START.md](MULTILINGUAL_QUICK_START.md) ⭐⭐⭐ NEW!
+**10-minute multilingual setup**
+- Shona, Ndebele, Zulu, Xhosa, Afrikaans support
+- Fast translation setup
+- Test examples
+- Quick troubleshooting
+
+**Read this if:** Patients speak African languages
 
 ---
 
@@ -40,6 +51,20 @@ Complete guide to all documentation files in the MediScribe-Vibe integration.
 ---
 
 ## 📚 Complete Documentation
+
+### [MULTILINGUAL_GUIDE.md](MULTILINGUAL_GUIDE.md) ⭐⭐⭐ NEW!
+**Complete multilingual guide**
+- Supported languages (6 total)
+- Translation methods (NLLB vs Google)
+- Example conversations in Shona & Ndebele
+- Language detection
+- Privacy & security
+- Use cases
+- Best practices
+
+**Read this for:** Complete multilingual understanding
+
+---
 
 ### [VIBE_INTEGRATION.md](VIBE_INTEGRATION.md) ⭐⭐⭐
 **Complete integration guide** (Most comprehensive)

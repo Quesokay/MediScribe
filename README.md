@@ -20,6 +20,16 @@ MediScribe now integrates directly with [Vibe](https://github.com/thewh1teagle/v
 
 👉 **[START HERE](START_HERE.md)** | **[5-Min Setup](VIBE_QUICK_SETUP.md)** | **[Complete Guide](VIBE_INTEGRATION.md)**
 
+### 🌐 **NEW: Multilingual Support!** ✅ WORKING!
+
+Patients can now speak in their native language! MediScribe automatically translates and processes:
+
+✅ **Shona** | ✅ **Ndebele** | ✅ **Zulu** | ✅ **Xhosa** | ✅ **Afrikaans** → English
+
+**Status:** Fully operational! Translation tested and working.
+
+👉 **[Success Guide](SUCCESS_MULTILINGUAL.md)** | **[Quick Start](MULTILINGUAL_QUICK_START.md)** | **[Complete Guide](MULTILINGUAL_GUIDE.md)**
+
 ## Features
 
 ✓ **Fast Processing** - Extract data in 1-2 seconds  

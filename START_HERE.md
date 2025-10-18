@@ -8,8 +8,18 @@ Your MediScribe system now has **automatic Vibe integration**. This means when y
 
 ## ⚡ Quick Start (Choose Your Path)
 
+### 🌐 Multilingual Path (10 minutes) ⭐ NEW!
+**For users who need Shona, Ndebele, or other African languages:**
+
+1. Open `MULTILINGUAL_QUICK_START.md`
+2. Install translation dependencies
+3. Start multilingual service
+4. Patients speak in native language!
+
+**Supports:** Shona, Ndebele, Zulu, Xhosa, Afrikaans → English
+
 ### 🏃 Fast Track (5 minutes)
-**For users who want to get started immediately:**
+**For English-only users who want to get started immediately:**
 
 1. Open `VIBE_QUICK_SETUP.md`
 2. Follow the 5 steps

@@ -1,0 +1,66 @@
+{
+  "patient_name": "Michael Brown",
+  "age": "28",
+  "gender": "male",
+  "symptoms": [
+    {
+      "text": "fever",
+      "context": "Presents with sore throat and fever for 3 days."
+    },
+    {
+      "text": "sore throat",
+      "context": "Presents with sore throat and fever for 3 days."
+    }
+  ],
+  "diagnosis": [
+    {
+      "text": "Strep throat"
+    }
+  ],
+  "medications": [
+    {
+      "text": "Amoxicillin"
+    }
+  ],
+  "dosages": [
+    {
+      "text": "500mg",
+      "start": 191,
+      "end": 196
+    },
+    {
+      "text": "three times daily",
+      "start": 197,
+      "end": 214
+    }
+  ],
+  "vital_signs": [
+    {
+      "text": "Temperature 100.2",
+      "start": 89,
+      "end": 106
+    },
+    {
+      "text": "100.2 Fahrenheit",
+      "start": 101,
+      "end": 117
+    },
+    {
+      "text": "pressure 118/75",
+      "start": 125,
+      "end": 140
+    }
+  ],
+  "allergies": [],
+  "treatment_plan": [
+    {
+      "text": "Rest, drink plenty of fluids, complete full course of antibiotics.\nFollow up if symptoms don't improve in 48 hours"
+    }
+  ],
+  "follow_up": [
+    {
+      "text": "if symptoms don't improve in 48 hours"
+    }
+  ],
+  "raw_transcription": "Patient Michael Brown, 28 year old male.\nPresents with sore throat and fever for 3 days.\nTemperature 100.2 Fahrenheit, blood pressure 118/75.\n\nDiagnosis: Strep throat.\nPrescribed Amoxicillin 500mg three times daily for 10 days.\n\nTreatment plan: Rest, drink plenty of fluids, complete full course of antibiotics.\nFollow up if symptoms don't improve in 48 hours."
+}

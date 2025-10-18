@@ -1,0 +1,9 @@
+Patient Michael Brown, 28 year old male.
+Presents with sore throat and fever for 3 days.
+Temperature 100.2 Fahrenheit, blood pressure 118/75.
+
+Diagnosis: Strep throat.
+Prescribed Amoxicillin 500mg three times daily for 10 days.
+
+Treatment plan: Rest, drink plenty of fluids, complete full course of antibiotics.
+Follow up if symptoms don't improve in 48 hours.

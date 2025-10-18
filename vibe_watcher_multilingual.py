@@ -1,6 +1,6 @@
 """
-Vibe-MediScribe Integration Service
-Watches a directory for new Vibe transcripts and automatically processes them
+Vibe-MediScribe Integration Service with Multilingual Support
+Watches for new Vibe transcripts, translates if needed, then processes with MediScribe
 """
 import time
 import json
@@ -8,15 +8,20 @@ from pathlib import Path
 from datetime import datetime
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+from translator import MultilingualTranslator
 from medical_extractor_simple import MedicalExtractor
 from database_saver import MedicalRecordDB
 
 
-class VibeTranscriptHandler(FileSystemEventHandler):
-    """Handles new transcript files from Vibe"""
+class MultilingualVibeHandler(FileSystemEventHandler):
+    """Handles new transcript files from Vibe with translation support"""
     
     def __init__(self, config: dict):
         self.config = config
+        self.translator = MultilingualTranslator(
+            translation_method=config.get('translation_method', 'nllb'),
+            google_api_key=config.get('google_api_key')
+        )
         self.extractor = MedicalExtractor()
         self.db = MedicalRecordDB()
         self.processed_files = set()
@@ -24,10 +29,11 @@ class VibeTranscriptHandler(FileSystemEventHandler):
         # Load previously processed files
         self._load_processed_files()
         
-        print("✓ Vibe-MediScribe Integration Active")
+        print("✓ Multilingual Vibe-MediScribe Integration Active")
         print(f"✓ Watching: {config['watch_directory']}")
-        print(f"✓ File types: {', '.join(config['file_extensions'])}")
-        print(f"✓ Auto-process: {'ON' if config['auto_process'] else 'OFF'}\n")
+        print(f"✓ Translation: {config.get('translation_method', 'nllb').upper()}")
+        print(f"✓ Supported languages: Shona, Ndebele, Zulu, Xhosa, Afrikaans")
+        print(f"✓ File types: {', '.join(config['file_extensions'])}\n")
     
     def _load_processed_files(self):
         """Load list of already processed files"""
@@ -49,7 +55,7 @@ class VibeTranscriptHandler(FileSystemEventHandler):
         file_path = Path(event.src_path)
         
         # Skip files created by MediScribe itself
-        if '_mediscribe' in file_path.name:
+        if '_mediscribe' in file_path.name or '_english' in file_path.name:
             return
         
         # Check if file extension matches
@@ -66,17 +72,16 @@ class VibeTranscriptHandler(FileSystemEventHandler):
         self.process_transcript(file_path)
     
     def on_modified(self, event):
-        """Called when a file is modified (Vibe might save incrementally)"""
+        """Called when a file is modified"""
         if event.is_directory:
             return
         
         file_path = Path(event.src_path)
         
         # Skip files created by MediScribe itself
-        if '_mediscribe' in file_path.name:
+        if '_mediscribe' in file_path.name or '_english' in file_path.name:
             return
         
-        # Only process if configured and not already processed
         if (file_path.suffix in self.config['file_extensions'] and 
             str(file_path) not in self.processed_files and
             self.config.get('process_on_modify', False)):
@@ -85,16 +90,40 @@ class VibeTranscriptHandler(FileSystemEventHandler):
             self.process_transcript(file_path)
     
     def process_transcript(self, file_path: Path):
-        """Process a transcript file with MediScribe"""
+        """Process a transcript file with translation and extraction"""
         try:
             print(f"\n{'='*70}")
             print(f"📄 New transcript detected: {file_path.name}")
             print(f"⏰ Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
             print(f"{'='*70}\n")
             
-            # Extract medical information
-            print("🔍 Extracting medical information...")
-            result = self.extractor.extract_from_file(str(file_path))
+            # Read original transcript
+            with open(file_path, "r", encoding="utf-8") as f:
+                original_text = f.read()
+            
+            # Translate if needed
+            print("🌐 Checking language and translating if needed...")
+            translated_text, source_language = self.translator.translate(
+                original_text,
+                source_lang=self.config.get('source_language')  # None = auto-detect
+            )
+            
+            # Save translated version if translation occurred
+            if source_language != "english":
+                translated_path = file_path.parent / f"{file_path.stem}_english{file_path.suffix}"
+                with open(translated_path, "w", encoding="utf-8") as f:
+                    f.write(translated_text)
+                print(f"✓ Saved English translation: {translated_path.name}")
+            
+            # Extract medical information from English text
+            print("\n🔍 Extracting medical information...")
+            result = self.extractor.extract_from_text(translated_text)
+            
+            # Add translation metadata
+            result['original_language'] = source_language
+            result['translation_method'] = self.config.get('translation_method', 'nllb')
+            if source_language != "english":
+                result['original_text'] = original_text
             
             # Display key findings
             print("\n✓ Extraction complete!")
@@ -104,6 +133,8 @@ class VibeTranscriptHandler(FileSystemEventHandler):
                 print(f"  📅 Age: {result['age']}")
             if result.get('gender'):
                 print(f"  ⚧ Gender: {result['gender']}")
+            if source_language != "english":
+                print(f"  🌐 Original language: {self.translator.language_codes[source_language]['name']}")
             if result.get('diagnosis'):
                 diagnoses = [d['text'] for d in result['diagnosis']]
                 print(f"  🏥 Diagnosis: {', '.join(diagnoses)}")
@@ -134,6 +165,8 @@ class VibeTranscriptHandler(FileSystemEventHandler):
             
         except Exception as e:
             print(f"\n❌ Error processing {file_path.name}: {e}")
+            import traceback
+            traceback.print_exc()
             print(f"{'='*70}\n")
     
     def _play_notification(self):
@@ -142,10 +175,10 @@ class VibeTranscriptHandler(FileSystemEventHandler):
             import winsound
             winsound.MessageBeep(winsound.MB_ICONASTERISK)
         except:
-            pass  # Silently fail if not on Windows or winsound not available
+            pass
 
 
-def load_config(config_path: str = "vibe_config.json") -> dict:
+def load_config(config_path: str = "vibe_config_multilingual.json") -> dict:
     """Load configuration from JSON file"""
     config_file = Path(config_path)
     
@@ -158,7 +191,11 @@ def load_config(config_path: str = "vibe_config.json") -> dict:
             "process_on_modify": False,
             "save_extracted_json": True,
             "notification_sound": True,
-            "database_path": "medical_records.json"
+            "database_path": "medical_records.json",
+            "translation_method": "nllb",
+            "source_language": None,
+            "google_api_key": None,
+            "supported_languages": ["shona", "ndebele", "zulu", "xhosa", "afrikaans", "english"]
         }
         
         with open(config_file, "w") as f:
@@ -176,9 +213,10 @@ def load_config(config_path: str = "vibe_config.json") -> dict:
 def main():
     """Main entry point"""
     print("\n" + "="*70)
-    print("  🎙️  VIBE-MEDISCRIBE INTEGRATION SERVICE")
+    print("  🌐 MULTILINGUAL VIBE-MEDISCRIBE INTEGRATION")
     print("="*70)
-    print("  Automatically processes Vibe transcripts with MediScribe")
+    print("  Supports: Shona, Ndebele, Zulu, Xhosa, Afrikaans → English")
+    print("  Automatically translates and processes Vibe transcripts")
     print("  Press Ctrl+C to stop\n")
     
     # Load configuration
@@ -193,20 +231,20 @@ def main():
         print(f"✓ Created: {watch_dir}\n")
     
     # Set up file watcher
-    event_handler = VibeTranscriptHandler(config)
+    event_handler = MultilingualVibeHandler(config)
     observer = Observer()
     observer.schedule(event_handler, str(watch_dir), recursive=False)
     observer.start()
     
     try:
-        print("👀 Monitoring for new transcripts...")
-        print("💡 Tip: Configure Vibe to save transcripts to the watch directory\n")
+        print("👀 Monitoring for new transcripts in any supported language...")
+        print("💡 Tip: Patients can speak in Shona, Ndebele, or other supported languages\n")
         
         while True:
             time.sleep(1)
     
     except KeyboardInterrupt:
-        print("\n\n🛑 Stopping Vibe-MediScribe Integration...")
+        print("\n\n🛑 Stopping Multilingual Vibe-MediScribe Integration...")
         observer.stop()
         observer.join()
         print("✓ Service stopped\n")

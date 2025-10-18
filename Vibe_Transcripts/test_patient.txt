@@ -1,0 +1,11 @@
+Patient John Doe, 45 year old male, presents with persistent cough and fever 
+for the past 5 days. Temperature is 101.5 Fahrenheit, blood pressure 130/85. 
+Patient reports difficulty breathing and chest tightness. No known allergies.
+
+Diagnosis: Suspected pneumonia. Ordered chest X-ray to confirm.
+
+Prescribed Amoxicillin 500mg three times daily for 7 days. Also recommended 
+over-the-counter fever reducer as needed.
+
+Treatment plan: Rest, increase fluid intake, monitor temperature. 
+Follow up in one week or sooner if symptoms worsen.
