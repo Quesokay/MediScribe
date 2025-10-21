@@ -138,7 +138,9 @@ Prescribed Amoxicillin 500mg three times daily.
 - `batch_process.py` - Process single or multiple files
 - `view_database.py` - View and search records
 - `database_saver.py` - Database management
-- `vibe_watcher.py` - **NEW!** Automatic Vibe integration service
+- `vibe_watcher.py` - Automatic Vibe integration service
+- `translator_simple.py` - Multilingual translation
+- `mcp_server.py` - **NEW!** MCP server for AI assistant integration
 - `vibe_config.json` - Configuration for Vibe integration
 
 ## Documentation
@@ -170,13 +172,27 @@ Easily customize for your needs:
 - Integrate with EHR systems
 - Export to various formats
 
+## 🔌 **NEW: MCP Server Integration!**
+
+MediScribe now works as an MCP (Model Context Protocol) server! Any AI assistant can use MediScribe's tools:
+
+✅ **Extract medical data** from transcriptions  
+✅ **Translate** multilingual patient notes  
+✅ **Search** medical records database  
+✅ **Process files** automatically  
+
+**Compatible with:** Claude Desktop, Kiro IDE, and any MCP-compatible AI assistant
+
+👉 **[MCP Setup Guide](MCP_SETUP.md)** | **[Usage Examples](MCP_USAGE_EXAMPLES.md)**
+
 ## Roadmap
 
 - [x] **Vibe integration** - Automatic background processing
+- [x] **Multi-language support** - Shona, Ndebele, Zulu, Xhosa, Afrikaans
+- [x] **MCP Server** - AI assistant integration
 - [ ] Web interface for doctors
 - [ ] Real-time transcription integration
 - [ ] Advanced analytics dashboard
-- [ ] Multi-language support
 - [ ] EHR system integration
 - [ ] Mobile app
 
