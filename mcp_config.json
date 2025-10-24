@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "mediscribe": {
+      "command": "python",
+      "args": ["C:/full/path/to/your/mcp_server.py"],
+      "env": {},
+      "disabled": false,
+      "autoApprove": [
+        "process_conversation",
+        "extract_medical_data",
+        "translate_and_extract",
+        "search_patient_records",
+        "get_patient_record",
+        "get_all_records"
+      ]
+    }
+  }
+}
