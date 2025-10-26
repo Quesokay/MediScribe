@@ -114,29 +114,70 @@ class MultilingualTranslator:
         src_code = self.language_codes[source_lang]["nllb"]
         tgt_code = self.language_codes[target_lang]["nllb"]
         
-        # Tokenize
+        # Extract and preserve proper nouns (names) - pattern: capitalized words after "Ndini" or similar
+        import re
+        name_pattern = r'(?:Ndini|ndini)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)'
+        name_matches = re.findall(name_pattern, text)
+        
+        # Create placeholders for names
+        text_with_placeholders = text
+        name_map = {}
+        for i, name in enumerate(name_matches):
+            placeholder = f"NAMEPLACEHOLDER{i}"
+            name_map[placeholder] = name
+            text_with_placeholders = text_with_placeholders.replace(f"Ndini {name}", f"I am {placeholder}")
+            text_with_placeholders = text_with_placeholders.replace(f"ndini {name}", f"I am {placeholder}")
+        
+        # Split text into sentences to avoid truncation
+        # Simple split by newlines and periods
+        sentences = []
+        for line in text_with_placeholders.split('\n'):
+            if line.strip():
+                # Further split by periods if line is long
+                if len(line) > 200:
+                    parts = line.split('. ')
+                    sentences.extend([p.strip() + '.' if not p.endswith('.') else p.strip() for p in parts if p.strip()])
+                else:
+                    sentences.append(line.strip())
+        
+        # Translate each sentence
+        translations = []
         self.tokenizer.src_lang = src_code
-        inputs = self.tokenizer(text, return_tensors="pt", padding=True)
         
         # Get target language token ID
-        # Handle both old and new tokenizer API
         if hasattr(self.tokenizer, 'lang_code_to_id'):
             forced_bos_token_id = self.tokenizer.lang_code_to_id[tgt_code]
         else:
-            # Newer API: convert language code to token ID
             forced_bos_token_id = self.tokenizer.convert_tokens_to_ids(tgt_code)
         
-        # Generate translation
-        translated_tokens = self.model.generate(
-            **inputs,
-            forced_bos_token_id=forced_bos_token_id,
-            max_length=512
-        )
+        for sentence in sentences:
+            if not sentence:
+                continue
+                
+            # Tokenize with truncation disabled
+            inputs = self.tokenizer(sentence, return_tensors="pt", padding=True, truncation=False, max_length=None)
+            
+            # Generate translation
+            translated_tokens = self.model.generate(
+                **inputs,
+                forced_bos_token_id=forced_bos_token_id,
+                max_length=512,
+                num_beams=5,  # Better quality
+                early_stopping=True
+            )
+            
+            # Decode
+            translation = self.tokenizer.batch_decode(translated_tokens, skip_special_tokens=True)[0]
+            translations.append(translation)
         
-        # Decode
-        translation = self.tokenizer.batch_decode(translated_tokens, skip_special_tokens=True)[0]
+        # Join translations
+        final_translation = '\n'.join(translations)
         
-        return translation
+        # Restore proper nouns
+        for placeholder, name in name_map.items():
+            final_translation = final_translation.replace(placeholder, name)
+        
+        return final_translation
     
     def translate_google(self, text: str, source_lang: str, target_lang: str = "english") -> str:
         """

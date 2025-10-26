@@ -28,6 +28,7 @@ python mcp_server.py
 ```
 
 You should see:
+
 ```
 🚀 Initializing MediScribe MCP Server...
 ✓ Medical extractor ready
@@ -60,9 +61,7 @@ Waiting for ChatGPT/Claude to connect and send conversations...
   "mcpServers": {
     "mediscribe": {
       "command": "python",
-      "args": [
-        "C:/Clone_wars/MediScribe/mcp_server.py"
-      ]
+      "args": ["C:/Clone_wars/MediScribe/mcp_server.py"]
     }
   }
 }
@@ -91,6 +90,7 @@ Waiting for ChatGPT/Claude to connect and send conversations...
 In Claude Desktop, look for the **🔧 tools icon** (usually in the bottom right or input area).
 
 Click it and you should see **7 MediScribe tools**:
+
 - process_conversation
 - extract_medical_data
 - translate_and_extract
@@ -121,12 +121,14 @@ Please process this conversation using the process_conversation tool.
 ```
 
 Claude will:
+
 1. Automatically call the `process_conversation` tool
 2. Send the conversation to MediScribe
 3. MediScribe extracts the medical data
 4. Claude shows you the structured results
 
 You should see in your MCP server terminal:
+
 ```
 ======================================================================
 📝 Processing conversation from ChatGPT/Claude
@@ -149,6 +151,7 @@ You should see in your MCP server terminal:
 ```
 
 And Claude will respond with:
+
 ```
 I've processed the medical conversation. Here's the extracted data:
 
@@ -192,6 +195,7 @@ Chiremba: Ndichakupai Paracetamol 500mg.
 ```
 
 MediScribe will:
+
 - Detect language: Shona
 - Translate to English
 - Extract medical data
@@ -213,6 +217,7 @@ Claude will show you the results in English!
 ### With Text:
 
 Just type or paste a conversation and say:
+
 ```
 "Process this medical conversation"
 ```
@@ -232,6 +237,7 @@ Just type or paste a conversation and say:
 ### Claude doesn't show the tools icon
 
 **Solutions:**
+
 1. Make sure MCP server is running: `python mcp_server.py`
 2. Check `claude_desktop_config.json` path is correct
 3. Restart Claude Desktop completely
@@ -255,6 +261,7 @@ First run downloads ~2.5GB NLLB model (one-time, be patient)
 ### Path issues
 
 Make sure to use **forward slashes** `/` not backslashes `\`:
+
 ```json
 ✅ "C:/Clone_wars/MediScribe/mcp_server.py"
 ❌ "C:\\Clone_wars\\MediScribe\\mcp_server.py"

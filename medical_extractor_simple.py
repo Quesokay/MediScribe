@@ -69,16 +69,32 @@ class MedicalExtractor:
             "raw_transcription": transcription
         }
         
-        # Extract using spaCy's NER
-        for ent in doc.ents:
-            if ent.label_ == "PERSON" and not extracted_data["patient_name"]:
-                # First person mentioned is likely the patient
-                extracted_data["patient_name"] = ent.text
+        # Extract patient name - try multiple patterns
+        # Pattern 1: "I am [Name]" or "My name is [Name]"
+        name_pattern1 = re.search(r'(?:I am|my name is|I\'m)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)', transcription, re.IGNORECASE)
+        if name_pattern1:
+            extracted_data["patient_name"] = name_pattern1.group(1).strip()
         
-        # Extract age
+        # Pattern 2: "Patient: [Name]" at start of line
+        name_pattern2 = re.search(r'Patient:\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)', transcription)
+        if name_pattern2 and not extracted_data["patient_name"]:
+            extracted_data["patient_name"] = name_pattern2.group(1).strip()
+        
+        # Pattern 3: Use spaCy NER as fallback
+        if not extracted_data["patient_name"]:
+            for ent in doc.ents:
+                if ent.label_ == "PERSON":
+                    # Skip if it's "Doctor" or "Patient"
+                    if ent.text.lower() not in ['doctor', 'patient', 'dr']:
+                        extracted_data["patient_name"] = ent.text
+                        break
+        
+        # Extract age - multiple patterns
         age_match = re.search(r'(\d+)\s*year\s*old', transcription, re.IGNORECASE)
+        if not age_match:
+            age_match = re.search(r'I am (\d+)|I\'m (\d+)|age[:\s]+(\d+)', transcription, re.IGNORECASE)
         if age_match:
-            extracted_data["age"] = age_match.group(1)
+            extracted_data["age"] = age_match.group(1) or age_match.group(2) or age_match.group(3)
         
         # Extract gender
         gender_match = re.search(r'\b(male|female|man|woman)\b', transcription, re.IGNORECASE)
@@ -92,7 +108,19 @@ class MedicalExtractor:
         # Extract symptoms (look for common symptom keywords)
         symptom_keywords = ['cough', 'fever', 'pain', 'headache', 'nausea', 'vomiting', 
                            'dizziness', 'fatigue', 'weakness', 'breathing', 'chest tightness',
-                           'sore throat', 'runny nose', 'congestion']
+                           'sore throat', 'runny nose', 'congestion', 'ache', 'hurt', 'sick']
+        
+        # Also look for "I have [symptom]" or "feeling [symptom]" patterns
+        symptom_pattern = re.findall(r'(?:I have|I\'m feeling|feeling|experiencing|suffering from)\s+(?:a\s+)?([a-z\s]+?)(?:\.|,|and|$)', transcription, re.IGNORECASE)
+        for symptom in symptom_pattern:
+            symptom = symptom.strip()
+            if symptom and len(symptom) < 50:  # Reasonable length
+                extracted_data["symptoms"].append({
+                    "text": symptom,
+                    "context": symptom
+                })
+        
+        # Keyword-based extraction
         for keyword in symptom_keywords:
             if keyword in transcription.lower():
                 # Find the sentence containing the symptom
