@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "mediscribe": {
+      "command": "python",
+      "args": [
+        "C:/Clone_wars/MediScribe/mcp_server.py"
+      ]
+    }
+  }
+}
