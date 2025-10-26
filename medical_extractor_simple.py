@@ -15,7 +15,8 @@ from typing import Dict, List
 class MedicalExtractor:
     def __init__(self):
         """Initialize with spaCy's standard model + custom medical patterns"""
-        print("Loading spaCy model...")
+        import sys
+        print("Loading spaCy model...", file=sys.stderr)
         self.nlp = spacy.load("en_core_web_sm")
         
         # Add custom entity ruler for medical terms
@@ -183,9 +184,10 @@ class MedicalExtractor:
     
     def save_to_json(self, extracted_data: Dict, output_path: str):
         """Save extracted data to JSON file"""
+        import sys
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(extracted_data, f, indent=2, ensure_ascii=False)
-        print(f"✓ Saved extracted data to {output_path}")
+        print(f"Saved extracted data to {output_path}", file=sys.stderr)
 
 
 def main():
@@ -207,8 +209,8 @@ def main():
     print("="*60)
     print("MEDICAL TRANSCRIPTION EXTRACTOR - Lightweight Version")
     print("="*60)
-    print("✓ No LLM required - Fast CPU processing")
-    print("✓ Uses spaCy + custom medical patterns\n")
+    print("No LLM required - Fast CPU processing")
+    print("Uses spaCy + custom medical patterns\n")
     
     extractor = MedicalExtractor()
     
@@ -222,7 +224,7 @@ def main():
     
     # Save to file
     extractor.save_to_json(result, "extracted_medical_data.json")
-    print("\n✓ Processing complete!")
+    print("\nProcessing complete!")
 
 
 if __name__ == "__main__":

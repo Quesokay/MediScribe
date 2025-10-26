@@ -18,11 +18,13 @@
 ## Quick Setup (5 Minutes)
 
 ### Step 1: Install
+
 ```bash
 setup_chatgpt_mode.bat
 ```
 
 ### Step 2: Start MCP Server
+
 ```bash
 python mcp_server.py
 ```
@@ -33,10 +35,13 @@ Keep this running!
 
 1. Open `mcp_config.json`
 2. Change this line:
+
    ```json
    "args": ["C:/full/path/to/your/mcp_server.py"]
    ```
+
    To your actual path, like:
+
    ```json
    "args": ["C:/Users/YourName/Documents/mediscribe/mcp_server.py"]
    ```
@@ -48,6 +53,7 @@ Keep this running!
 ### Step 4: Test
 
 In ChatGPT, type:
+
 ```
 "I'm going to give you a medical conversation to process.
 
@@ -62,6 +68,7 @@ Please process this conversation."
 ```
 
 ChatGPT will automatically:
+
 - Call the MediScribe tool
 - Extract the medical data
 - Show you the results
@@ -88,6 +95,7 @@ ChatGPT will automatically:
 ### Multilingual
 
 Works with:
+
 - English
 - Shona
 - Ndebele
@@ -102,6 +110,7 @@ Just say: "Process this Shona conversation" (or any language)
 ## What You Get
 
 ### Input
+
 ```
 Doctor: Hi, what's your name?
 Patient: I'm Sarah, 28. I have a headache and fever.
@@ -109,6 +118,7 @@ Doctor: Temperature is 101.5F. I'll prescribe Ibuprofen 400mg.
 ```
 
 ### Output (from ChatGPT)
+
 ```
 Patient: Sarah, 28 years old
 Symptoms: headache, fever

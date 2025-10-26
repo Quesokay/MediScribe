@@ -22,29 +22,47 @@ from datetime import datetime
 
 
 # Initialize components
-print("🚀 Initializing MediScribe MCP Server...")
+# Note: Using print() for logging - in STDIO mode, this goes to stderr automatically
+import sys
+import io
+import os
+
+# Force UTF-8 encoding for Windows console
+if sys.platform == 'win32':
+    os.system('chcp 65001 >nul 2>&1')  # Set console to UTF-8
+
+# Set UTF-8 encoding for both stdout and stderr
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace', line_buffering=True)
+sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace', line_buffering=True)
+
+print("Initializing MediScribe MCP Server...", file=sys.stderr)
+
+# Get the project directory (where this script is located)
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(PROJECT_DIR, "medical_records.json")
+
 extractor = MedicalExtractor()
-db = MedicalRecordDB()
-print("✓ Medical extractor ready")
-print("✓ Database ready")
+db = MedicalRecordDB(db_path=DB_PATH)
+print("Medical extractor ready", file=sys.stderr)
+print(f"Database ready at: {DB_PATH}", file=sys.stderr)
 
 # Try to load translator
 try:
     from translator import MultilingualTranslator
     translator = MultilingualTranslator(translation_method="nllb")
     TRANSLATION_AVAILABLE = True
-    print("✓ Multilingual translation ready (NLLB-200)")
-    print("  Supported: Shona, Ndebele, Zulu, Xhosa, Afrikaans → English")
+    print("Multilingual translation ready (NLLB-200)", file=sys.stderr)
+    print("  Supported: Shona, Ndebele, Zulu, Xhosa, Afrikaans -> English", file=sys.stderr)
 except Exception as e:
-    print(f"⚠️  Translation not available: {e}")
-    print("  English-only mode")
+    print(f"Translation not available: {e}", file=sys.stderr)
+    print("  English-only mode", file=sys.stderr)
     TRANSLATION_AVAILABLE = False
 
-print("\n" + "="*70)
-print("MediScribe MCP Server Ready!")
-print("="*70)
-print("Waiting for ChatGPT to connect and send conversations...")
-print("="*70 + "\n")
+print("\n" + "="*70, file=sys.stderr)
+print("MediScribe MCP Server Ready!", file=sys.stderr)
+print("="*70, file=sys.stderr)
+print("Waiting for Claude to connect and send conversations...", file=sys.stderr)
+print("="*70 + "\n", file=sys.stderr)
 
 # Create MCP server
 app = Server("mediscribe")
@@ -217,33 +235,33 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
             conversation = arguments["conversation"]
             save_to_db = arguments.get("save_to_db", True)
             
-            print("\n" + "="*70)
-            print(f"📝 Processing conversation from ChatGPT")
-            print(f"   Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-            print(f"   Length: {len(conversation)} characters")
-            print("="*70)
+            print("\n" + "="*70, file=sys.stderr)
+            print(f"Processing conversation from Claude", file=sys.stderr)
+            print(f"   Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", file=sys.stderr)
+            print(f"   Length: {len(conversation)} characters", file=sys.stderr)
+            print("="*70, file=sys.stderr)
             
             # Step 1: Language detection
             original_language = "english"
             translated_text = conversation
             
             if TRANSLATION_AVAILABLE:
-                print("🔍 Detecting language...")
+                print("Detecting language...", file=sys.stderr)
                 original_language = translator.detect_language(conversation)
-                print(f"   Detected: {original_language.title()}")
+                print(f"   Detected: {original_language.title()}", file=sys.stderr)
                 
                 # Step 2: Translation if needed
                 if original_language != "english":
-                    print(f"🌐 Translating from {original_language.title()} to English...")
+                    print(f"Translating from {original_language.title()} to English...", file=sys.stderr)
                     translated_text, _ = translator.translate(conversation, original_language)
-                    print("   ✓ Translation complete")
+                    print("   Translation complete", file=sys.stderr)
                 else:
-                    print("   ✓ Already in English")
+                    print("   Already in English", file=sys.stderr)
             else:
-                print("ℹ️  Translation not available - processing as English")
+                print("Translation not available - processing as English", file=sys.stderr)
             
             # Step 3: Extract medical data
-            print("🔬 Extracting medical data...")
+            print("Extracting medical data...", file=sys.stderr)
             extracted_data = extractor.extract_from_text(translated_text)
             
             # Add metadata
@@ -255,26 +273,26 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                 extracted_data["original_text"] = conversation
                 extracted_data["translated_text"] = translated_text
             
-            print("   ✓ Extraction complete")
+            print("   Extraction complete", file=sys.stderr)
             
             # Step 4: Save to database if requested
             if save_to_db:
-                print("💾 Saving to database...")
+                print("Saving to database...", file=sys.stderr)
                 record_id = db.add_record(extracted_data)
                 extracted_data["record_id"] = record_id
-                print(f"   ✓ Saved as: {record_id}")
+                print(f"   Saved as: {record_id}", file=sys.stderr)
             
             # Display summary
-            print("\n📊 Summary:")
+            print("\nSummary:", file=sys.stderr)
             if extracted_data.get("patient_name"):
-                print(f"   Patient: {extracted_data['patient_name']}")
+                print(f"   Patient: {extracted_data['patient_name']}", file=sys.stderr)
             if extracted_data.get("symptoms"):
-                print(f"   Symptoms: {len(extracted_data['symptoms'])} found")
+                print(f"   Symptoms: {len(extracted_data['symptoms'])} found", file=sys.stderr)
             if extracted_data.get("diagnosis"):
-                print(f"   Diagnosis: {len(extracted_data['diagnosis'])} found")
+                print(f"   Diagnosis: {len(extracted_data['diagnosis'])} found", file=sys.stderr)
             if extracted_data.get("medications"):
-                print(f"   Medications: {len(extracted_data['medications'])} found")
-            print("="*70 + "\n")
+                print(f"   Medications: {len(extracted_data['medications'])} found", file=sys.stderr)
+            print("="*70 + "\n", file=sys.stderr)
             
             # Return formatted response
             response = {
@@ -284,9 +302,10 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                 "data": extracted_data
             }
             
+            # Ensure ASCII-safe JSON output
             return [TextContent(
                 type="text",
-                text=json.dumps(response, indent=2)
+                text=json.dumps(response, indent=2, ensure_ascii=True)
             )]
         
         elif name == "extract_medical_data":
@@ -305,7 +324,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
             
             return [TextContent(
                 type="text",
-                text=json.dumps(extracted_data, indent=2)
+                text=json.dumps(extracted_data, indent=2, ensure_ascii=True)
             )]
         
         elif name == "translate_and_extract":
@@ -314,7 +333,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                     type="text",
                     text=json.dumps({
                         "error": "Translation not available. Install required packages: pip install transformers torch"
-                    })
+                    }, ensure_ascii=True)
                 )]
             
             transcription = arguments["transcription"]
@@ -337,7 +356,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
             
             return [TextContent(
                 type="text",
-                text=json.dumps(extracted_data, indent=2)
+                text=json.dumps(extracted_data, indent=2, ensure_ascii=True)
             )]
         
         elif name == "search_patient_records":
@@ -350,7 +369,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                     "patient_name": patient_name,
                     "records_found": len(records),
                     "records": records
-                }, indent=2)
+                }, indent=2, ensure_ascii=True)
             )]
         
         elif name == "get_patient_record":
@@ -360,12 +379,12 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
             if record:
                 return [TextContent(
                     type="text",
-                    text=json.dumps(record, indent=2)
+                    text=json.dumps(record, indent=2, ensure_ascii=True)
                 )]
             else:
                 return [TextContent(
                     type="text",
-                    text=json.dumps({"error": f"Record not found: {record_id}"})
+                    text=json.dumps({"error": f"Record not found: {record_id}"}, ensure_ascii=True)
                 )]
         
         elif name == "get_all_records":
@@ -377,7 +396,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                 text=json.dumps({
                     "total_records": len(records),
                     "records": records
-                }, indent=2)
+                }, indent=2, ensure_ascii=True)
             )]
         
         elif name == "save_to_database":
@@ -390,7 +409,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                     "success": True,
                     "record_id": record_id,
                     "message": f"Record saved successfully as {record_id}"
-                }, indent=2)
+                }, indent=2, ensure_ascii=True)
             )]
         
         elif name == "process_file":
@@ -409,13 +428,13 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
             
             return [TextContent(
                 type="text",
-                text=json.dumps(extracted_data, indent=2)
+                text=json.dumps(extracted_data, indent=2, ensure_ascii=True)
             )]
         
         else:
             return [TextContent(
                 type="text",
-                text=json.dumps({"error": f"Unknown tool: {name}"})
+                text=json.dumps({"error": f"Unknown tool: {name}"}, ensure_ascii=True)
             )]
     
     except Exception as e:
@@ -425,7 +444,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                 "error": str(e),
                 "tool": name,
                 "arguments": arguments
-            })
+            }, ensure_ascii=True)
         )]
 
 

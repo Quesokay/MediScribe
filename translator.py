@@ -1,9 +1,10 @@
 """
 Multilingual Translation Module for MediScribe
-Supports Shona, Ndebele, and other languages → English
+Supports Shona, Ndebele, and other languages to English
 Uses NLLB (No Language Left Behind) by Meta and Google Translate API
 """
 import os
+import sys
 from pathlib import Path
 from typing import Dict, Optional, Tuple
 import json
@@ -39,7 +40,7 @@ class MultilingualTranslator:
         if self.method == "nllb":
             self._load_nllb_model()
         elif self.method == "google" and not self.google_api_key:
-            print("⚠️  Warning: Google Translate API key not found")
+            print("Warning: Google Translate API key not found", file=sys.stderr)
             print("   Set GOOGLE_TRANSLATE_API_KEY environment variable")
             print("   Falling back to NLLB (offline translation)")
             self.method = "nllb"
@@ -50,8 +51,8 @@ class MultilingualTranslator:
         try:
             from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
             
-            print("📥 Loading NLLB translation model...")
-            print("   (First run will download ~2.5GB model)")
+            print("Loading NLLB translation model...", file=sys.stderr)
+            print("   (First run will download ~2.5GB model)", file=sys.stderr)
             
             # Use the smaller distilled model for faster performance
             model_name = "facebook/nllb-200-distilled-600M"
@@ -59,11 +60,11 @@ class MultilingualTranslator:
             self.tokenizer = AutoTokenizer.from_pretrained(model_name)
             self.model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
             
-            print("✓ NLLB model loaded successfully")
+            print("NLLB model loaded successfully", file=sys.stderr)
             
         except Exception as e:
-            print(f"❌ Error loading NLLB model: {e}")
-            print("   Install with: pip install transformers torch")
+            print(f"Error loading NLLB model: {e}", file=sys.stderr)
+            print("   Install with: pip install transformers torch", file=sys.stderr)
             raise
     
     def detect_language(self, text: str) -> str:
@@ -168,8 +169,8 @@ class MultilingualTranslator:
             return result['translatedText']
             
         except Exception as e:
-            print(f"❌ Google Translate error: {e}")
-            print("   Falling back to NLLB...")
+            print(f"Google Translate error: {e}", file=sys.stderr)
+            print("   Falling back to NLLB...", file=sys.stderr)
             return self.translate_nllb(text, source_lang, target_lang)
     
     def translate(self, text: str, source_lang: Optional[str] = None, target_lang: str = "english") -> Tuple[str, str]:
@@ -187,14 +188,14 @@ class MultilingualTranslator:
         # Auto-detect language if not specified
         if source_lang is None:
             source_lang = self.detect_language(text)
-            print(f"🔍 Detected language: {self.language_codes[source_lang]['name']}")
+            print(f"Detected language: {self.language_codes[source_lang]['name']}", file=sys.stderr)
         
         # Skip translation if already in target language
         if source_lang == target_lang:
-            print(f"✓ Text already in {self.language_codes[target_lang]['name']}")
+            print(f"Text already in {self.language_codes[target_lang]['name']}", file=sys.stderr)
             return text, source_lang
         
-        print(f"🌐 Translating from {self.language_codes[source_lang]['name']} to {self.language_codes[target_lang]['name']}...")
+        print(f"Translating from {self.language_codes[source_lang]['name']} to {self.language_codes[target_lang]['name']}...", file=sys.stderr)
         
         # Translate based on method
         if self.method == "google":
@@ -202,7 +203,7 @@ class MultilingualTranslator:
         else:
             translated = self.translate_nllb(text, source_lang, target_lang)
         
-        print("✓ Translation complete")
+        print("Translation complete", file=sys.stderr)
         
         return translated, source_lang
     
@@ -229,7 +230,7 @@ class MultilingualTranslator:
         if output_path:
             with open(output_path, "w", encoding="utf-8") as f:
                 f.write(translated_text)
-            print(f"✓ Saved translated file: {output_path}")
+            print(f"Saved translated file: {output_path}", file=sys.stderr)
         
         # Return info
         return {
@@ -248,7 +249,7 @@ def main():
     print("="*70)
     print("MULTILINGUAL TRANSLATOR - MediScribe")
     print("="*70)
-    print("Supports: Shona, Ndebele, Zulu, Xhosa, Afrikaans → English\n")
+    print("Supports: Shona, Ndebele, Zulu, Xhosa, Afrikaans to English\n")
     
     # Sample medical conversation in Shona
     shona_text = """
@@ -274,7 +275,7 @@ def main():
     translator = MultilingualTranslator(translation_method="nllb")
     
     print("\n" + "="*70)
-    print("TEST 1: Shona → English")
+    print("TEST 1: Shona to English")
     print("="*70)
     print("\nOriginal (Shona):")
     print(shona_text)
@@ -284,7 +285,7 @@ def main():
     print(translated_shona)
     
     print("\n" + "="*70)
-    print("TEST 2: Ndebele → English")
+    print("TEST 2: Ndebele to English")
     print("="*70)
     print("\nOriginal (Ndebele):")
     print(ndebele_text)
@@ -294,7 +295,7 @@ def main():
     print(translated_ndebele)
     
     print("\n" + "="*70)
-    print("✓ Translation tests complete!")
+    print("Translation tests complete!")
     print("="*70)
 
 

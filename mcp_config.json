@@ -1,8 +1,8 @@
 {
-  "mcpServers": {
-    "mediscribe": {
-      "command": "python",
-      "args": ["C:/full/path/to/your/mcp_server.py"],
+  "mcp.settings": {
+    "sonnet": {
+      "command": "C:/Clone_wars/MediScribe/.venv/Scripts/python.exe",
+      "args": ["C:/Clone_wars/MediScribe/mcp_server.py"],
       "env": {},
       "disabled": false,
       "autoApprove": [

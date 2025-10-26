@@ -12,8 +12,11 @@ from typing import Dict, List
 class MedicalRecordDB:
     def __init__(self, db_path: str = "medical_records.json"):
         """Initialize the database"""
+        import sys
         self.db_path = Path(db_path)
         self.records = self._load_records()
+        print(f"Database initialized: {self.db_path.absolute()}", file=sys.stderr)
+        print(f"Loaded {len(self.records)} existing records", file=sys.stderr)
     
     def _load_records(self) -> List[Dict]:
         """Load existing records from file"""
@@ -24,8 +27,13 @@ class MedicalRecordDB:
     
     def _save_records(self):
         """Save records to file"""
-        with open(self.db_path, "w", encoding="utf-8") as f:
-            json.dump(self.records, f, indent=2, ensure_ascii=False)
+        import sys
+        try:
+            with open(self.db_path, "w", encoding="utf-8") as f:
+                json.dump(self.records, f, indent=2, ensure_ascii=False)
+            print(f"Database file updated: {self.db_path.absolute()}", file=sys.stderr)
+        except Exception as e:
+            print(f"ERROR saving database: {e}", file=sys.stderr)
     
     def add_record(self, extracted_data: Dict) -> str:
         """
@@ -59,7 +67,8 @@ class MedicalRecordDB:
         self.records.append(record)
         self._save_records()
         
-        print(f"✓ Record saved with ID: {record_id}")
+        import sys
+        print(f"Record saved with ID: {record_id}", file=sys.stderr)
         return record_id
     
     def get_record(self, record_id: str) -> Dict:
@@ -73,8 +82,10 @@ class MedicalRecordDB:
         """Search records by patient name"""
         return [r for r in self.records if r.get("patient_name") == patient_name]
     
-    def get_all_records(self) -> List[Dict]:
-        """Get all records"""
+    def get_all_records(self, limit: int = None) -> List[Dict]:
+        """Get all records, optionally limited to a specific number"""
+        if limit:
+            return self.records[:limit]
         return self.records
 
 
