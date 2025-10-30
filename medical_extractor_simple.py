@@ -17,10 +17,14 @@ class MedicalExtractor:
         """Initialize with spaCy's standard model + custom medical patterns"""
         import sys
         print("Loading spaCy model...", file=sys.stderr)
-        self.nlp = spacy.load("en_core_web_sm")
+        
+        # Load with only essential components for faster startup
+        self.nlp = spacy.load("en_core_web_sm", exclude=["lemmatizer", "textcat"])
+        print("SpaCy model loaded", file=sys.stderr)
         
         # Add custom entity ruler for medical terms
         self._add_medical_patterns()
+        print("Medical patterns loaded", file=sys.stderr)
         
     def _add_medical_patterns(self):
         """Add patterns for medical entity recognition"""

@@ -36,15 +36,23 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='repla
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace', line_buffering=True)
 
 print("Initializing MediScribe MCP Server...", file=sys.stderr)
+sys.stderr.flush()
 
 # Get the project directory (where this script is located)
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(PROJECT_DIR, "medical_records.json")
 
+print("Creating medical extractor...", file=sys.stderr)
+sys.stderr.flush()
 extractor = MedicalExtractor()
-db = MedicalRecordDB(db_path=DB_PATH)
 print("Medical extractor ready", file=sys.stderr)
+sys.stderr.flush()
+
+print("Creating database...", file=sys.stderr)
+sys.stderr.flush()
+db = MedicalRecordDB(db_path=DB_PATH)
 print(f"Database ready at: {DB_PATH}", file=sys.stderr)
+sys.stderr.flush()
 
 # Try to load translator
 try:
