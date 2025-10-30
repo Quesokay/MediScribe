@@ -1,0 +1,16 @@
+Patient Sarah Johnson, 32 year old female.
+Presents with severe headache and nausea for 2 days.
+Temperature 99.8 Fahrenheit, blood pressure 125/80.
+Patient reports sensitivity to light and occasional dizziness.
+No known allergies.
+
+Diagnosis: Migraine headache.
+Ordered blood work to rule out other causes.
+
+Prescribed Sumatriptan 50mg as needed for migraine attacks, maximum 2 doses per day.
+Also recommended over-the-counter ibuprofen 400mg for pain management.
+
+Treatment plan: Rest in dark, quiet room. Stay hydrated. Avoid triggers like bright lights and loud noises.
+Keep a headache diary to identify patterns.
+
+Follow up in two weeks or sooner if symptoms worsen or new symptoms develop.

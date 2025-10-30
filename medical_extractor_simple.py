@@ -15,7 +15,8 @@ from typing import Dict, List
 class MedicalExtractor:
     def __init__(self):
         """Initialize with spaCy's standard model + custom medical patterns"""
-        print("Loading spaCy model...")
+        import sys
+        print("Loading spaCy model...", file=sys.stderr)
         self.nlp = spacy.load("en_core_web_sm")
         
         # Add custom entity ruler for medical terms
@@ -68,16 +69,32 @@ class MedicalExtractor:
             "raw_transcription": transcription
         }
         
-        # Extract using spaCy's NER
-        for ent in doc.ents:
-            if ent.label_ == "PERSON" and not extracted_data["patient_name"]:
-                # First person mentioned is likely the patient
-                extracted_data["patient_name"] = ent.text
+        # Extract patient name - try multiple patterns
+        # Pattern 1: "I am [Name]" or "My name is [Name]"
+        name_pattern1 = re.search(r'(?:I am|my name is|I\'m)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)', transcription, re.IGNORECASE)
+        if name_pattern1:
+            extracted_data["patient_name"] = name_pattern1.group(1).strip()
         
-        # Extract age
+        # Pattern 2: "Patient: [Name]" at start of line
+        name_pattern2 = re.search(r'Patient:\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)', transcription)
+        if name_pattern2 and not extracted_data["patient_name"]:
+            extracted_data["patient_name"] = name_pattern2.group(1).strip()
+        
+        # Pattern 3: Use spaCy NER as fallback
+        if not extracted_data["patient_name"]:
+            for ent in doc.ents:
+                if ent.label_ == "PERSON":
+                    # Skip if it's "Doctor" or "Patient"
+                    if ent.text.lower() not in ['doctor', 'patient', 'dr']:
+                        extracted_data["patient_name"] = ent.text
+                        break
+        
+        # Extract age - multiple patterns
         age_match = re.search(r'(\d+)\s*year\s*old', transcription, re.IGNORECASE)
+        if not age_match:
+            age_match = re.search(r'I am (\d+)|I\'m (\d+)|age[:\s]+(\d+)', transcription, re.IGNORECASE)
         if age_match:
-            extracted_data["age"] = age_match.group(1)
+            extracted_data["age"] = age_match.group(1) or age_match.group(2) or age_match.group(3)
         
         # Extract gender
         gender_match = re.search(r'\b(male|female|man|woman)\b', transcription, re.IGNORECASE)
@@ -91,7 +108,19 @@ class MedicalExtractor:
         # Extract symptoms (look for common symptom keywords)
         symptom_keywords = ['cough', 'fever', 'pain', 'headache', 'nausea', 'vomiting', 
                            'dizziness', 'fatigue', 'weakness', 'breathing', 'chest tightness',
-                           'sore throat', 'runny nose', 'congestion']
+                           'sore throat', 'runny nose', 'congestion', 'ache', 'hurt', 'sick']
+        
+        # Also look for "I have [symptom]" or "feeling [symptom]" patterns
+        symptom_pattern = re.findall(r'(?:I have|I\'m feeling|feeling|experiencing|suffering from)\s+(?:a\s+)?([a-z\s]+?)(?:\.|,|and|$)', transcription, re.IGNORECASE)
+        for symptom in symptom_pattern:
+            symptom = symptom.strip()
+            if symptom and len(symptom) < 50:  # Reasonable length
+                extracted_data["symptoms"].append({
+                    "text": symptom,
+                    "context": symptom
+                })
+        
+        # Keyword-based extraction
         for keyword in symptom_keywords:
             if keyword in transcription.lower():
                 # Find the sentence containing the symptom
@@ -183,9 +212,10 @@ class MedicalExtractor:
     
     def save_to_json(self, extracted_data: Dict, output_path: str):
         """Save extracted data to JSON file"""
+        import sys
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(extracted_data, f, indent=2, ensure_ascii=False)
-        print(f"✓ Saved extracted data to {output_path}")
+        print(f"Saved extracted data to {output_path}", file=sys.stderr)
 
 
 def main():
@@ -207,8 +237,8 @@ def main():
     print("="*60)
     print("MEDICAL TRANSCRIPTION EXTRACTOR - Lightweight Version")
     print("="*60)
-    print("✓ No LLM required - Fast CPU processing")
-    print("✓ Uses spaCy + custom medical patterns\n")
+    print("No LLM required - Fast CPU processing")
+    print("Uses spaCy + custom medical patterns\n")
     
     extractor = MedicalExtractor()
     
@@ -222,7 +252,7 @@ def main():
     
     # Save to file
     extractor.save_to_json(result, "extracted_medical_data.json")
-    print("\n✓ Processing complete!")
+    print("\nProcessing complete!")
 
 
 if __name__ == "__main__":

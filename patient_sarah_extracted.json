@@ -1,0 +1,74 @@
+{
+  "patient_name": "Sarah Johnson",
+  "age": "32",
+  "gender": "female",
+  "symptoms": [
+    {
+      "text": "pain",
+      "context": "Also recommended over-the-counter ibuprofen 400mg for pain management."
+    },
+    {
+      "text": "headache",
+      "context": "Patient Sarah Johnson, 32 year old female.\nPresents with severe headache and nausea for 2 days."
+    },
+    {
+      "text": "nausea",
+      "context": "Patient Sarah Johnson, 32 year old female.\nPresents with severe headache and nausea for 2 days."
+    },
+    {
+      "text": "dizziness",
+      "context": "Patient reports sensitivity to light and occasional dizziness."
+    }
+  ],
+  "diagnosis": [
+    {
+      "text": "Migraine headache"
+    }
+  ],
+  "medications": [
+    {
+      "text": "Sumatriptan"
+    }
+  ],
+  "dosages": [
+    {
+      "text": "50mg",
+      "start": 331,
+      "end": 335
+    },
+    {
+      "text": "400mg",
+      "start": 437,
+      "end": 442
+    }
+  ],
+  "vital_signs": [
+    {
+      "text": "Temperature 99.8",
+      "start": 96,
+      "end": 112
+    },
+    {
+      "text": "99.8 Fahrenheit",
+      "start": 108,
+      "end": 123
+    },
+    {
+      "text": "pressure 125/80",
+      "start": 131,
+      "end": 146
+    }
+  ],
+  "allergies": [],
+  "treatment_plan": [
+    {
+      "text": "Rest in dark, quiet room. Stay hydrated"
+    }
+  ],
+  "follow_up": [
+    {
+      "text": "in two weeks or sooner if symptoms worsen or new symptoms develop"
+    }
+  ],
+  "raw_transcription": "Patient Sarah Johnson, 32 year old female.\nPresents with severe headache and nausea for 2 days.\nTemperature 99.8 Fahrenheit, blood pressure 125/80.\nPatient reports sensitivity to light and occasional dizziness.\nNo known allergies.\n\nDiagnosis: Migraine headache.\nOrdered blood work to rule out other causes.\n\nPrescribed Sumatriptan 50mg as needed for migraine attacks, maximum 2 doses per day.\nAlso recommended over-the-counter ibuprofen 400mg for pain management.\n\nTreatment plan: Rest in dark, quiet room. Stay hydrated. Avoid triggers like bright lights and loud noises.\nKeep a headache diary to identify patterns.\n\nFollow up in two weeks or sooner if symptoms worsen or new symptoms develop.\n"
+}

@@ -1,0 +1,14 @@
+{
+  "watch_directory": "Vibe_Transcripts",
+  "file_extensions": [
+    ".txt",
+    ".srt",
+    ".vtt",
+    ".json"
+  ],
+  "auto_process": true,
+  "process_on_modify": false,
+  "save_extracted_json": true,
+  "notification_sound": true,
+  "database_path": "medical_records.json"
+}
