@@ -1,75 +1,72 @@
 """
-Test MCP Server Connection
-Quick diagnostic to see if the server can start properly
+Test MCP connection from ADK server
 """
-import sys
 import asyncio
+import json
+from pathlib import Path
+from adk_mcp_server import MCPClient, PYTHON_PATH, MCP_SERVER_PATH
 
-async def test_server():
+async def test_mcp():
+    """Test MCP client connection"""
     print("="*70)
-    print("MCP Server Connection Test")
+    print("Testing MCP Connection")
     print("="*70)
-    print()
     
-    # Test 1: Check imports
-    print("Test 1: Checking imports...")
-    try:
-        from mcp.server import Server
-        from mcp.types import Tool, TextContent
-        import mcp.server.stdio
-        print("✓ MCP imports successful")
-    except Exception as e:
-        print(f"✗ MCP import failed: {e}")
-        return
+    # Create MCP client
+    print(f"\n1. Creating MCP client...")
+    print(f"   Python: {PYTHON_PATH}")
+    print(f"   Server: {MCP_SERVER_PATH}")
     
-    # Test 2: Check medical components
-    print("\nTest 2: Checking medical components...")
-    try:
-        from medical_extractor_simple import MedicalExtractor
-        from database_saver import MedicalRecordDB
-        print("✓ Medical components loaded")
-    except Exception as e:
-        print(f"✗ Medical components failed: {e}")
-        return
+    client = MCPClient(PYTHON_PATH, MCP_SERVER_PATH)
     
-    # Test 3: Check translator
-    print("\nTest 3: Checking translator...")
-    try:
-        from translator import MultilingualTranslator
-        print("✓ Translator available")
-    except Exception as e:
-        print(f"⚠️  Translator not available: {e}")
+    # Start MCP server
+    print(f"\n2. Starting MCP server...")
+    await client.start()
+    await asyncio.sleep(3)  # Wait for server to initialize
+    print("   ✓ MCP server started")
     
-    # Test 4: Create server
-    print("\nTest 4: Creating MCP server...")
-    try:
-        app = Server("mediscribe")
-        print("✓ Server created successfully")
-    except Exception as e:
-        print(f"✗ Server creation failed: {e}")
-        return
+    # Test process_conversation
+    print(f"\n3. Testing process_conversation tool...")
+    test_conversation = """
+    Patient John Doe, age 45, presents with severe headache for 3 days.
+    Blood pressure is 140/90. Temperature 37.2°C.
+    Diagnosed with migraine. Prescribed ibuprofen 400mg three times daily.
+    """
     
-    # Test 5: Check tools
-    print("\nTest 5: Checking tools...")
     try:
-        # Import the actual server to get tools
-        import mcp_server
-        print("✓ Server module loaded")
+        result = await client.call_tool("process_conversation", {
+            "conversation": test_conversation,
+            "save_to_db": True
+        })
+        print("   ✓ Tool call successful")
+        print(f"\n   Result:")
+        print(json.dumps(result, indent=2))
     except Exception as e:
-        print(f"✗ Server module failed: {e}")
-        return
+        print(f"   ✗ Tool call failed: {e}")
+    
+    # Test search
+    print(f"\n4. Testing search_patient_records tool...")
+    try:
+        result = await client.call_tool("search_patient_records", {
+            "patient_name": "John Doe"
+        })
+        print("   ✓ Search successful")
+        print(f"\n   Found {result.get('records_found', 0)} records")
+    except Exception as e:
+        print(f"   ✗ Search failed: {e}")
+    
+    # Stop MCP server
+    print(f"\n5. Stopping MCP server...")
+    await client.stop()
+    print("   ✓ MCP server stopped")
     
     print("\n" + "="*70)
-    print("✓ All tests passed!")
+    print("MCP Connection Test Complete!")
     print("="*70)
-    print()
-    print("If Claude still doesn't see tools, try:")
-    print("1. Completely quit Claude Desktop (check Task Manager)")
-    print("2. Wait 10 seconds")
-    print("3. Start Claude Desktop again")
-    print("4. Wait for it to fully load")
-    print("5. Look for the tools icon")
-    print()
+    print("\nIf all tests passed, your setup is ready!")
+    print("Run: START_ADK_MEDISCRIBE.bat")
+    print("Then open: http://localhost:4200")
+    print("="*70)
 
 if __name__ == "__main__":
-    asyncio.run(test_server())
+    asyncio.run(test_mcp())
